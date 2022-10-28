@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/data/datasources/data_source.dart';
-import 'package:restaurant_app/data/datasources/data_source_impl.dart';
-import 'package:restaurant_app/data/repositories/restaurant_repository_impl.dart';
-import 'package:restaurant_app/domain/entities/restaurant.dart';
-import 'package:restaurant_app/domain/repositories/restaurant_repository.dart';
-import 'package:restaurant_app/presentation/pages/restaurant_detail_page.dart';
-import 'package:restaurant_app/presentation/pages/restaurant_list_page.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/data/data.dart';
+import 'package:restaurant_app/domain/domain.dart';
+import 'package:restaurant_app/presentation/presentation.dart';
+import 'package:restaurant_app/provider/restaurant_provider.dart';
 
 void main() {
   runApp(const RestaurantApp());
@@ -16,26 +15,29 @@ class RestaurantApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DataSource dataSource = DataSourceImpl(context: context);
+    DataSource dataSource = DataSourceImpl(client: http.Client());
     RestaurantRepository repository = RestaurantRepositoryImpl(
       dataSource: dataSource,
     );
 
-    return MaterialApp(
-      title: 'Restaurant App',
-      theme: ThemeData(
-        colorSchemeSeed: const Color(0xFF6750A4),
-        useMaterial3: true,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<RestaurantProvider>(
+          create: (_) => RestaurantProvider(repository),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Restaurant App',
+        theme: ThemeData(
+          colorSchemeSeed: const Color(0xFF6750A4),
+          useMaterial3: true,
+        ),
+        initialRoute: RestaurantListPage.routeName,
+        routes: {
+          RestaurantListPage.routeName: (_) => const RestaurantListPage(),
+          RestaurantDetailPage.routeName: (_) => const RestaurantDetailPage(),
+        },
       ),
-      initialRoute: RestaurantListPage.routeName,
-      routes: {
-        RestaurantListPage.routeName: (context) =>
-            RestaurantListPage(repository: repository),
-        RestaurantDetailPage.routeName: (context) => RestaurantDetailPage(
-              restaurant:
-                  ModalRoute.of(context)?.settings.arguments as Restaurant,
-            )
-      },
     );
   }
 }

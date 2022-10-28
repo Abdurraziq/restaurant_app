@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/domain/entities/menu.dart';
-import 'package:restaurant_app/presentation/widgets/restaurant_menu_item.dart';
+import 'package:restaurant_app/domain/domain.dart';
+import 'restaurant_menu_item.dart';
 
 class RestaurantMenuList extends StatelessWidget {
   final List<Menu>? menus;

@@ -1,79 +1,138 @@
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/domain/entities/restaurant.dart';
-import 'package:restaurant_app/presentation/widgets/restaurant_menu_list.dart';
-import 'package:restaurant_app/presentation/widgets/vertical_text_icon.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/commons/commons.dart';
+import 'package:restaurant_app/domain/domain.dart';
+import 'package:restaurant_app/presentation/presentation.dart';
+import 'package:restaurant_app/provider/restaurant_provider.dart';
 
 class RestaurantDetailPage extends StatelessWidget {
   static const routeName = '/restaurant_detail';
 
-  final Restaurant restaurant;
-
-  const RestaurantDetailPage({super.key, required this.restaurant});
+  const RestaurantDetailPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(restaurant.name),
+        title: const Text("Detail"),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _heroSection(),
-            Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 720),
-                child: Column(
-                  children: [
-                    _titleSection(textTheme: textTheme),
-                    _infoSection(),
-                    _descriptionSection(context: context),
-                    _menusSection(textTheme: textTheme)
-                  ],
-                ),
-              ),
-            ),
-          ],
+      body: Center(
+        child: SingleChildScrollView(
+          child: Consumer<RestaurantProvider>(
+            builder: (context, value, child) {
+              final apiState = value.restaurantDetailApiState;
+              if (apiState is OnDataLoaded<RestaurantDetail>) {
+                final RestaurantDetail restaurant = apiState.data;
+                return _buildContent(
+                  restaurant: restaurant,
+                  context: context,
+                );
+              } else if (apiState is OnFailure<RestaurantDetail>) {
+                return OnFailureWidget(
+                  message: apiState.message,
+                  withRefreshButton: true,
+                  onTap: () {
+                    value.refreshDetailData();
+                  },
+                );
+              }
+              return const CircularProgressIndicator();
+            },
+          ),
         ),
       ),
     );
   }
 
-  Widget _heroSection() => Hero(
-        tag: "img-${restaurant.id}",
-        child: Image.network(
-          restaurant.pictureId,
-          width: double.infinity,
-          height: 320,
-          fit: BoxFit.cover,
+  Widget _buildContent({
+    required RestaurantDetail restaurant,
+    required BuildContext context,
+  }) {
+    TextTheme textTheme = Theme.of(context).textTheme;
+
+    return Column(
+      children: [
+        _heroSection(
+          pictureId: restaurant.pictureId,
+        ),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720),
+          child: Column(
+            children: [
+              _titleSection(
+                name: restaurant.name,
+                textTheme: textTheme,
+              ),
+              _infoSection(
+                city: restaurant.city,
+                rating: restaurant.rating.toString(),
+              ),
+              _categoriesSection(
+                categories: restaurant.categories,
+                textTheme: textTheme,
+              ),
+              _descriptionSection(
+                description: restaurant.description,
+                context: context,
+              ),
+              _menusSection(
+                menus: restaurant.menus,
+                textTheme: textTheme,
+              ),
+              _reviewsSection(
+                id: restaurant.id,
+                textTheme: textTheme,
+                context: context,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _heroSection({
+    required String pictureId,
+  }) =>
+      Image.network(
+        Endpoint.smallPicture(pictureId),
+        width: double.infinity,
+        height: 320,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return const Icon(Icons.broken_image_outlined);
+        },
+      );
+
+  Widget _titleSection({
+    required String name,
+    required TextTheme textTheme,
+  }) =>
+      Padding(
+        padding: const EdgeInsets.only(top: 32.0),
+        child: Text(
+          name,
+          style: textTheme.headlineLarge,
         ),
       );
 
-  Widget _titleSection({required TextTheme textTheme}) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 32.0),
-      child: Text(
-        restaurant.name,
-        style: textTheme.headlineLarge,
-      ),
-    );
-  }
-
-  Widget _infoSection() => Padding(
+  Widget _infoSection({
+    required String city,
+    required String rating,
+  }) =>
+      Padding(
         padding: const EdgeInsets.symmetric(vertical: 32.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             VerticalTextIcon(
-              text: restaurant.rating.toString(),
+              text: rating,
               icon: Icons.star,
               color: const Color(0xFFB3261E),
             ),
             VerticalTextIcon(
-              text: restaurant.city,
+              text: city,
               icon: Icons.place,
               color: const Color(0xFF6750A4),
             ),
@@ -81,43 +140,69 @@ class RestaurantDetailPage extends StatelessWidget {
         ),
       );
 
-  Widget _descriptionSection({required BuildContext context}) {
+  Widget _categoriesSection({
+    required List<Category>? categories,
+    required TextTheme textTheme,
+  }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Card(
-        shape: RoundedRectangleBorder(
-          side: BorderSide(
-            color: Theme.of(context).colorScheme.outline,
+      padding: const EdgeInsets.only(bottom: 32.0),
+      child: Column(
+        children: [
+          Text(
+            "Category",
+            style: textTheme.headlineSmall,
           ),
-          borderRadius: const BorderRadius.all(Radius.circular(12)),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Text(
-                "About",
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(
-                height: 16.0,
-              ),
-              Text(
-                restaurant.description,
-                softWrap: true,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ],
-          ),
-        ),
+          categories != null
+              ? CategoryChips(categories: categories)
+              : const Text("No categories"),
+        ],
       ),
     );
   }
 
-  Widget _menusSection({required TextTheme textTheme}) => Column(
+  Widget _descriptionSection({
+    required String description,
+    required BuildContext context,
+  }) =>
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Card(
+          shape: RoundedRectangleBorder(
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.outline,
+            ),
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                Text(
+                  "About",
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const SizedBox(
+                  height: 16.0,
+                ),
+                Text(
+                  description,
+                  softWrap: true,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+  Widget _menusSection({
+    required Menus? menus,
+    required TextTheme textTheme,
+  }) =>
+      Column(
         children: [
           const SizedBox(
             height: 32,
@@ -131,7 +216,7 @@ class RestaurantDetailPage extends StatelessWidget {
             child: Text("Foods"),
           ),
           RestaurantMenuList(
-            menus: restaurant.menus?.foods,
+            menus: menus?.foods,
             icon: Icons.restaurant_menu,
           ),
           const Padding(
@@ -139,9 +224,47 @@ class RestaurantDetailPage extends StatelessWidget {
             child: Text("Drinks"),
           ),
           RestaurantMenuList(
-            menus: restaurant.menus?.drinks,
+            menus: menus?.drinks,
             icon: Icons.local_bar,
           ),
         ],
       );
+
+  Widget _reviewsSection({
+    required String id,
+    required TextTheme textTheme,
+    required BuildContext context,
+  }) {
+    final customerReview =
+        context.read<RestaurantProvider>().restaurantReviewApiState;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 32.0, horizontal: 16.0),
+      child: Column(
+        children: [
+          Text(
+            "Review",
+            style: textTheme.headlineSmall,
+          ),
+          ReviewForm(
+            id: id,
+            submitCallback: (review) {
+              context.read<RestaurantProvider>().addNewReviews(review);
+            },
+          ),
+          const SizedBox(height: 16.0),
+          _reviewListSection(customerReview),
+        ],
+      ),
+    );
+  }
+
+  Widget _reviewListSection(ApiState<List<CustomerReview>> reviewsState) {
+    if (reviewsState is OnDataLoaded<List<CustomerReview>>) {
+      return ReviewList(reviews: reviewsState.data);
+    } else if (reviewsState is OnFailure<List<CustomerReview>>) {
+      return Text(reviewsState.message);
+    }
+    return const CircularProgressIndicator();
+  }
 }

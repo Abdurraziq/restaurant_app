@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/domain/entities/menu.dart';
+import 'package:restaurant_app/domain/domain.dart';
 
 class RestaurantMenuItem extends StatelessWidget {
   final Menu menu;

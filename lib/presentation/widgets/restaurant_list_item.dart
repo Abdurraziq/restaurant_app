@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/domain/entities/restaurant.dart';
-import 'package:restaurant_app/presentation/widgets/horizontal_text_icon.dart';
+import 'package:restaurant_app/commons/commons.dart';
+import 'package:restaurant_app/domain/domain.dart';
+import 'horizontal_text_icon.dart';
 
 class RestaurantListItem extends StatelessWidget {
   const RestaurantListItem({
@@ -10,11 +11,12 @@ class RestaurantListItem extends StatelessWidget {
   });
 
   final Restaurant restaurant;
-  final Function onTap;
+  final Function() onTap;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0),
         child: SizedBox(
@@ -24,12 +26,12 @@ class RestaurantListItem extends StatelessWidget {
             children: <Widget>[
               AspectRatio(
                 aspectRatio: 1,
-                child: Hero(
-                  tag: "img-${restaurant.id}",
-                  child: Image.network(
-                    restaurant.pictureId,
-                    fit: BoxFit.cover,
-                  ),
+                child: Image.network(
+                  Endpoint.smallPicture(restaurant.pictureId),
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(Icons.broken_image_outlined);
+                  },
                 ),
               ),
               Expanded(
@@ -44,9 +46,6 @@ class RestaurantListItem extends StatelessWidget {
           ),
         ),
       ),
-      onTap: () {
-        onTap();
-      },
     );
   }
 }

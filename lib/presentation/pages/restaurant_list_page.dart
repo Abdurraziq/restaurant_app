@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/domain/entities/restaurant.dart';
-import 'package:restaurant_app/domain/repositories/restaurant_repository.dart';
-import 'package:restaurant_app/presentation/pages/restaurant_detail_page.dart';
-import 'package:restaurant_app/presentation/widgets/restaurant_list_item.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/commons/commons.dart';
+import 'package:restaurant_app/domain/domain.dart';
+import 'package:restaurant_app/presentation/presentation.dart';
+import 'package:restaurant_app/provider/restaurant_provider.dart';
 
 class RestaurantListPage extends StatelessWidget {
   static const routeName = "/restaurant_list";
 
-  final RestaurantRepository repository;
-
-  const RestaurantListPage({super.key, required this.repository});
+  const RestaurantListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,14 +20,44 @@ class RestaurantListPage extends StatelessWidget {
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 720),
-          child: FutureBuilder<List<Restaurant>?>(
-            future: repository.getRestaurants(),
-            builder: (context, snapshot) {
-              final List<Restaurant>? restaurants = snapshot.data;
-              return restaurants != null && restaurants.isNotEmpty
-                  ? _restaurantList(restaurants)
-                  : _emptyList;
-            },
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: Consumer<RestaurantProvider>(
+                  builder: (context, provider, _) => TextFormField(
+                    decoration:
+                        const InputDecoration(hintText: "Search Restaurant"),
+                    onChanged: (text) {
+                      provider.setRestaurants(text);
+                    },
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Consumer<RestaurantProvider>(
+                  builder: (context, value, child) {
+                    final apiState = value.restaurantListApiState;
+                    if (apiState is OnDataLoaded<List<Restaurant>>) {
+                      final List<Restaurant> restaurants = apiState.data;
+                      return _restaurantList(restaurants);
+                    } else if (apiState is OnFailure<List<Restaurant>>) {
+                      final message = apiState.message;
+                      return OnFailureWidget(
+                        message: message,
+                        withRefreshButton: message != "Restaurant not found",
+                        onTap: () {
+                          value.setRestaurants();
+                        },
+                      );
+                    }
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -52,13 +81,13 @@ class RestaurantListPage extends StatelessWidget {
       RestaurantListItem(
         restaurant: restaurant,
         onTap: () {
+          context
+              .read<RestaurantProvider>()
+              .setRestaurantDetailData(restaurant.id);
           Navigator.pushNamed(
             context,
             RestaurantDetailPage.routeName,
-            arguments: restaurant,
           );
         },
       );
-
-  final Widget _emptyList = const Center(child: Text("Empty List"));
 }
