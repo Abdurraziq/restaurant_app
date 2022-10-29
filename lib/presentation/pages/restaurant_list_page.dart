@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:restaurant_app/commons/commons.dart';
 import 'package:restaurant_app/domain/domain.dart';
 import 'package:restaurant_app/presentation/presentation.dart';
-import 'package:restaurant_app/provider/restaurant_provider.dart';
+import 'package:restaurant_app/provider/provider.dart';
 
 class RestaurantListPage extends StatelessWidget {
   static const routeName = "/restaurant_list";
@@ -24,7 +24,7 @@ class RestaurantListPage extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6),
-                child: Consumer<RestaurantProvider>(
+                child: Consumer<ListProvider>(
                   builder: (context, provider, _) => TextFormField(
                     decoration:
                         const InputDecoration(hintText: "Search Restaurant"),
@@ -35,7 +35,7 @@ class RestaurantListPage extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: Consumer<RestaurantProvider>(
+                child: Consumer<ListProvider>(
                   builder: (context, value, child) {
                     final apiState = value.restaurantListApiState;
                     if (apiState is OnDataLoaded<List<Restaurant>>) {
@@ -81,9 +81,7 @@ class RestaurantListPage extends StatelessWidget {
       RestaurantListItem(
         restaurant: restaurant,
         onTap: () {
-          context
-              .read<RestaurantProvider>()
-              .setRestaurantDetailData(restaurant.id);
+          context.read<DetailProvider>().setRestaurantDetailData(restaurant.id);
           Navigator.pushNamed(
             context,
             RestaurantDetailPage.routeName,

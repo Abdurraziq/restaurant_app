@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/data.dart';
 import 'package:restaurant_app/domain/domain.dart';
 import 'package:restaurant_app/presentation/presentation.dart';
-import 'package:restaurant_app/provider/restaurant_provider.dart';
+import 'package:restaurant_app/provider/provider.dart';
 
 void main() {
   runApp(const RestaurantApp());
@@ -22,8 +22,14 @@ class RestaurantApp extends StatelessWidget {
 
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<RestaurantProvider>(
-          create: (_) => RestaurantProvider(repository),
+        ChangeNotifierProvider<ListProvider>(
+          create: (_) => ListProvider(repository),
+        ),
+        ChangeNotifierProvider<DetailProvider>(
+          create: (context) => DetailProvider(repository),
+        ),
+        ChangeNotifierProvider<ReviewProvider>(
+          create: (_) => ReviewProvider(repository),
         ),
       ],
       child: MaterialApp(

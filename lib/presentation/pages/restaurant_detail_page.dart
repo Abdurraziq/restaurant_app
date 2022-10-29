@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:restaurant_app/commons/commons.dart';
 import 'package:restaurant_app/domain/domain.dart';
 import 'package:restaurant_app/presentation/presentation.dart';
-import 'package:restaurant_app/provider/restaurant_provider.dart';
+import 'package:restaurant_app/provider/provider.dart';
 
 class RestaurantDetailPage extends StatelessWidget {
   static const routeName = '/restaurant_detail';
@@ -19,11 +19,15 @@ class RestaurantDetailPage extends StatelessWidget {
       ),
       body: Center(
         child: SingleChildScrollView(
-          child: Consumer<RestaurantProvider>(
-            builder: (context, value, child) {
+          child: Consumer<DetailProvider>(
+            builder: (context, value, _) {
               final apiState = value.restaurantDetailApiState;
               if (apiState is OnDataLoaded<RestaurantDetail>) {
                 final RestaurantDetail restaurant = apiState.data;
+                context
+                    .read<ReviewProvider>()
+                    .setRestaurantReview(restaurant.reviews);
+
                 return _buildContent(
                   restaurant: restaurant,
                   context: context,
@@ -81,7 +85,7 @@ class RestaurantDetailPage extends StatelessWidget {
                 textTheme: textTheme,
               ),
               _reviewsSection(
-                id: restaurant.id,
+                restaurant: restaurant,
                 textTheme: textTheme,
                 context: context,
               ),
@@ -143,22 +147,21 @@ class RestaurantDetailPage extends StatelessWidget {
   Widget _categoriesSection({
     required List<Category>? categories,
     required TextTheme textTheme,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 32.0),
-      child: Column(
-        children: [
-          Text(
-            "Category",
-            style: textTheme.headlineSmall,
-          ),
-          categories != null
-              ? CategoryChips(categories: categories)
-              : const Text("No categories"),
-        ],
-      ),
-    );
-  }
+  }) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 32.0),
+        child: Column(
+          children: [
+            Text(
+              "Category",
+              style: textTheme.headlineSmall,
+            ),
+            categories != null
+                ? CategoryChips(categories: categories)
+                : const Text("No categories"),
+          ],
+        ),
+      );
 
   Widget _descriptionSection({
     required String description,
@@ -231,13 +234,10 @@ class RestaurantDetailPage extends StatelessWidget {
       );
 
   Widget _reviewsSection({
-    required String id,
+    required RestaurantDetail restaurant,
     required TextTheme textTheme,
     required BuildContext context,
   }) {
-    final customerReview =
-        context.read<RestaurantProvider>().restaurantReviewApiState;
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 32.0, horizontal: 16.0),
       child: Column(
@@ -247,19 +247,31 @@ class RestaurantDetailPage extends StatelessWidget {
             style: textTheme.headlineSmall,
           ),
           ReviewForm(
-            id: id,
+            id: restaurant.id,
             submitCallback: (review) {
-              context.read<RestaurantProvider>().addNewReviews(review);
+              context.read<ReviewProvider>().addNewReviews(review);
             },
           ),
           const SizedBox(height: 16.0),
-          _reviewListSection(customerReview),
+          Consumer<ReviewProvider>(
+            builder: (_, value, __) {
+              return _reviewListSection(
+                restaurant.reviews,
+                value.restaurantReviewApiState,
+                context,
+              );
+            },
+          ),
         ],
       ),
     );
   }
 
-  Widget _reviewListSection(ApiState<List<CustomerReview>> reviewsState) {
+  Widget _reviewListSection(
+    List<CustomerReview>? reviews,
+    ApiState<List<CustomerReview>> reviewsState,
+    BuildContext context,
+  ) {
     if (reviewsState is OnDataLoaded<List<CustomerReview>>) {
       return ReviewList(reviews: reviewsState.data);
     } else if (reviewsState is OnFailure<List<CustomerReview>>) {
