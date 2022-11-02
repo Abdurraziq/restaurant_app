@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class OnFailureWidget extends StatelessWidget {
   final String message;
   final bool withRefreshButton;
-  final Function() onTap;
+  final Function()? onTap;
 
   const OnFailureWidget({
     super.key,
     required this.message,
     required this.withRefreshButton,
-    required this.onTap,
+    this.onTap,
   });
 
   @override

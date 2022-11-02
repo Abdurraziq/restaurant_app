@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:restaurant_app/commons/exception.dart';
+import 'package:restaurant_app/commons/commons.dart';
 
 Map<String, dynamic> getJsonFromResponse(http.Response response) {
   switch (response.statusCode) {

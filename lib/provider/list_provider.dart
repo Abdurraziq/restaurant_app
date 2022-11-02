@@ -3,10 +3,10 @@ import 'package:restaurant_app/commons/commons.dart';
 import 'package:restaurant_app/domain/domain.dart';
 
 class ListProvider with ChangeNotifier {
-  final RestaurantRepository _repository;
+  final RemoteRepository _repository;
 
   ListProvider(this._repository) {
-    _setRestaurantList();
+    _getRestaurantList();
   }
 
   String _queryString = "";
@@ -32,19 +32,25 @@ class ListProvider with ChangeNotifier {
     _setRestaurantListData(restaurants);
   }
 
-  void _setRestaurantList() async {
+  void _getRestaurantList() async {
     final restaurants = await _repository.getRestaurantsList();
     _setRestaurantListData(restaurants);
   }
 
-  void setRestaurants([String? query]) async {
+  void initRestaurant() async {
+    _restaurantListApiState = OnLoading();
+    final restaurants = await _repository.getRestaurantsList();
+    _setRestaurantListData(restaurants);
+  }
+
+  void getRestaurants([String? query]) async {
     _setRestaurantListLoading();
     _queryString = query ?? "";
 
     if (_queryString.isNotEmpty) {
       _searchRestaurants();
     } else {
-      _setRestaurantList();
+      _getRestaurantList();
     }
   }
 }

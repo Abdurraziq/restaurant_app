@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/commons/commons.dart';
 import 'package:restaurant_app/domain/domain.dart';
-import 'horizontal_text_icon.dart';
+import 'text_icon_horizontal.dart';
 
 class RestaurantListItem extends StatelessWidget {
   const RestaurantListItem({
@@ -73,13 +73,13 @@ class _ShortDetailSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           _name(textTheme.titleMedium),
-          HorizontalTextIcon(
+          TextIconHorizontal(
             text: "$rating",
             textStyle: textTheme.bodySmall,
             iconData: Icons.star,
             iconColor: const Color(0xFFB3261E),
           ),
-          HorizontalTextIcon(
+          TextIconHorizontal(
             text: city,
             textStyle: textTheme.labelSmall,
             iconData: Icons.place,

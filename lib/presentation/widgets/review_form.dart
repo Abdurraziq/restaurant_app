@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/domain/domain.dart';
 
 class ReviewForm extends StatefulWidget {
   final String id;
-  final Function(AddNewReview) submitCallback;
+  final Function(Map<String, String>) submitCallback;
 
   const ReviewForm({
     super.key,
@@ -36,23 +35,27 @@ class _ReviewFormState extends State<ReviewForm> {
         children: [
           TextFormField(
             controller: nameController,
-            decoration: const InputDecoration(hintText: "Enter Your name..."),
+            decoration: const InputDecoration(
+              border: UnderlineInputBorder(),
+              labelText: 'Enter your name',
+            ),
             validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter Your name.';
-              }
-              return null;
+              return (value == null || value.isEmpty)
+                  ? 'Please enter your name.'
+                  : null;
             },
           ),
           const SizedBox(height: 4),
           TextFormField(
             controller: reviewController,
-            decoration: const InputDecoration(hintText: "Enter Your review..."),
+            decoration: const InputDecoration(
+              border: UnderlineInputBorder(),
+              labelText: 'Enter your review',
+            ),
             validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter Your review.';
-              }
-              return null;
+              return (value == null || value.isEmpty)
+                  ? 'Please enter your review.'
+                  : null;
             },
           ),
           const SizedBox(height: 20),
@@ -60,12 +63,12 @@ class _ReviewFormState extends State<ReviewForm> {
             onPressed: () {
               if (_formKey.currentState?.validate() ?? false) {
                 super.widget.submitCallback(
-                      AddNewReview(
-                        id: super.widget.id,
-                        name: nameController.text,
-                        review: reviewController.text,
-                      ),
-                    );
+                  {
+                    'id': super.widget.id,
+                    'name': nameController.text,
+                    'review': reviewController.text,
+                  },
+                );
               }
             },
             icon: const Icon(Icons.add),

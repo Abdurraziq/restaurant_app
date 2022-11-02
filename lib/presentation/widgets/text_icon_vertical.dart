@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class VerticalTextIcon extends StatelessWidget {
+class TextIconVertical extends StatelessWidget {
   final String text;
   final IconData icon;
   final Color? color;
-  const VerticalTextIcon({
+  const TextIconVertical({
     super.key,
     required this.icon,
     required this.text,

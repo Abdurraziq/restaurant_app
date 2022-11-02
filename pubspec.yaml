@@ -16,6 +16,15 @@ dependencies:
   provider: ^6.0.4
   json_annotation: ^4.7.0
   http: ^0.13.5
+  shared_preferences: ^2.0.15
+  sqflite: ^2.2.0+2
+  flutter_local_notifications: ^12.0.3
+  android_alarm_manager_plus: ^2.1.0
+  path_provider: ^2.0.11
+  path: ^1.8.2
+  rxdart: ^0.27.5
+  intl: ^0.17.0
+  equatable: ^2.0.5
 
 dev_dependencies:
   flutter_test:
@@ -23,7 +32,8 @@ dev_dependencies:
 
   flutter_lints: ^2.0.0
   json_serializable: ^6.5.3
-  build_runner: ^2.3.2
+  build_runner: ^2.3.0
+  mocktail: ^0.3.0
 
 flutter:
   uses-material-design: true

@@ -3,7 +3,7 @@ import 'package:restaurant_app/commons/commons.dart';
 import 'package:restaurant_app/domain/domain.dart';
 
 class ReviewProvider with ChangeNotifier {
-  final RestaurantRepository _repository;
+  final RemoteRepository _repository;
 
   ReviewProvider(this._repository);
 
@@ -19,12 +19,12 @@ class ReviewProvider with ChangeNotifier {
     }
   }
 
-  void setRestaurantReview(List<CustomerReview>? data) {
+  void setRestaurantReviewData(List<CustomerReview>? data) {
     _restaurantReviewApiState =
         data != null ? OnDataLoaded(data) : OnFailure("No reviews");
   }
 
-  void addNewReviews(AddNewReview review) async {
+  void addNewReviews(Map<String, String> review) async {
     _setRestaurantReviewLoading();
     final restaurantReview = await _repository.addNewReview(review);
     _restaurantReviewApiState = restaurantReview;

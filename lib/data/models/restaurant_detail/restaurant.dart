@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:restaurant_app/domain/domain.dart';
 
@@ -8,19 +9,19 @@ import 'menus.dart';
 part 'restaurant.g.dart';
 
 @JsonSerializable()
-class RestaurantModel {
-  String? id;
-  String? name;
-  String? description;
-  String? city;
-  String? address;
-  String? pictureId;
-  double? rating;
-  List<CategoryModel>? categories;
-  MenusModel? menus;
-  List<CustomerReviewModel>? customerReviews;
+class RestaurantModel extends Equatable {
+  final String? id;
+  final String? name;
+  final String? description;
+  final String? city;
+  final String? address;
+  final String? pictureId;
+  final double? rating;
+  final List<CategoryModel>? categories;
+  final MenusModel? menus;
+  final List<CustomerReviewModel>? customerReviews;
 
-  RestaurantModel({
+  const RestaurantModel({
     this.id,
     this.name,
     this.description,
@@ -50,4 +51,18 @@ class RestaurantModel {
         menus: menus?.toEntity(),
         reviews: customerReviews?.reversed.map((e) => e.toEntity()).toList(),
       );
+
+  @override
+  List<Object?> get props => [
+        id,
+        name,
+        description,
+        city,
+        address,
+        pictureId,
+        rating,
+        categories,
+        menus,
+        customerReviews,
+      ];
 }

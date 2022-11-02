@@ -1,49 +1,52 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'package:restaurant_app/data/data.dart';
-import 'package:restaurant_app/domain/domain.dart';
+import 'package:restaurant_app/commons/commons.dart';
 import 'package:restaurant_app/presentation/presentation.dart';
-import 'package:restaurant_app/provider/provider.dart';
+import 'package:restaurant_app/utils/utils.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await setupNotification();
   runApp(const RestaurantApp());
 }
 
-class RestaurantApp extends StatelessWidget {
-  const RestaurantApp({super.key});
+class RestaurantApp extends StatefulWidget {
+  const RestaurantApp({Key? key}) : super(key: key);
+
+  @override
+  State<RestaurantApp> createState() => _RestaurantApp();
+}
+
+class _RestaurantApp extends State<RestaurantApp> {
+  final NotificationHelper _notificationHelper = NotificationHelper();
+
+  @override
+  void initState() {
+    super.initState();
+    _notificationHelper
+        .configureSelectNotificationSubject(DetailPage.routeName);
+  }
 
   @override
   Widget build(BuildContext context) {
-    DataSource dataSource = DataSourceImpl(client: http.Client());
-    RestaurantRepository repository = RestaurantRepositoryImpl(
-      dataSource: dataSource,
-    );
-
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<ListProvider>(
-          create: (_) => ListProvider(repository),
-        ),
-        ChangeNotifierProvider<DetailProvider>(
-          create: (context) => DetailProvider(repository),
-        ),
-        ChangeNotifierProvider<ReviewProvider>(
-          create: (_) => ReviewProvider(repository),
-        ),
-      ],
+      providers: providers,
       child: MaterialApp(
         title: 'Restaurant App',
+        navigatorKey: navigatorKey,
         theme: ThemeData(
           colorSchemeSeed: const Color(0xFF6750A4),
           useMaterial3: true,
         ),
-        initialRoute: RestaurantListPage.routeName,
-        routes: {
-          RestaurantListPage.routeName: (_) => const RestaurantListPage(),
-          RestaurantDetailPage.routeName: (_) => const RestaurantDetailPage(),
-        },
+        initialRoute: MainPages.routeName,
+        routes: routes,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    selectNotificationSubject.close();
+    super.dispose();
   }
 }

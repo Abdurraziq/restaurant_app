@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:restaurant_app/domain/domain.dart';
 
@@ -7,11 +8,11 @@ import 'food.dart';
 part 'menus.g.dart';
 
 @JsonSerializable()
-class MenusModel {
-  List<FoodModel>? foods;
-  List<DrinkModel>? drinks;
+class MenusModel extends Equatable {
+  final List<FoodModel>? foods;
+  final List<DrinkModel>? drinks;
 
-  MenusModel({this.foods, this.drinks});
+  const MenusModel({this.foods, this.drinks});
 
   factory MenusModel.fromJson(Map<String, dynamic> json) =>
       _$MenusModelFromJson(json);
@@ -22,4 +23,7 @@ class MenusModel {
         foods: foods?.map((e) => e.toEntity()).toList(),
         drinks: drinks?.map((e) => e.toEntity()).toList(),
       );
+
+  @override
+  List<Object?> get props => [foods, drinks];
 }

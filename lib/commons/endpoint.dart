@@ -1,10 +1,10 @@
 class Endpoint {
-  static const String apiBaseUrl = "restaurant-api.dicoding.dev";
-  static const String listOfRestaurantPath = "list";
-  static const String searchRestaurantPath = "search";
-  static const String addReviewPath = "review";
+  static const String _apiBaseUrl = "restaurant-api.dicoding.dev";
+  static const String _listOfRestaurantPath = "list";
+  static const String _searchRestaurantPath = "search";
+  static const String _addReviewPath = "review";
 
-  static String detailOfRestaurantPath(String id) => "detail/$id";
+  static String _detailOfRestaurantPath(String id) => "detail/$id";
 
   static const String _imageBaseUrl =
       "https://restaurant-api.dicoding.dev/images";
@@ -12,26 +12,26 @@ class Endpoint {
   static Uri _getUrl({required String path, Map<String, dynamic>? query}) {
     return Uri(
       scheme: 'https',
-      host: apiBaseUrl,
+      host: _apiBaseUrl,
       path: path,
       queryParameters: query,
     );
   }
 
   static Uri restaurantList() {
-    return _getUrl(path: listOfRestaurantPath);
+    return _getUrl(path: _listOfRestaurantPath);
   }
 
   static Uri restaurantDetail(String id) {
-    return _getUrl(path: detailOfRestaurantPath(id));
+    return _getUrl(path: _detailOfRestaurantPath(id));
   }
 
   static Uri searchRestaurant(String query) {
-    return _getUrl(path: searchRestaurantPath, query: {"q": query});
+    return _getUrl(path: _searchRestaurantPath, query: {"q": query});
   }
 
   static Uri addReview() {
-    return _getUrl(path: addReviewPath);
+    return _getUrl(path: _addReviewPath);
   }
 
   static String smallPicture(String id) => "$_imageBaseUrl/small/$id";

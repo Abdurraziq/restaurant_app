@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class HorizontalTextIcon extends StatelessWidget {
+class TextIconHorizontal extends StatelessWidget {
   final String text;
   final IconData iconData;
   final TextStyle? textStyle;
   final Color? iconColor;
 
-  const HorizontalTextIcon({
+  const TextIconHorizontal({
     super.key,
     required this.text,
     required this.iconData,

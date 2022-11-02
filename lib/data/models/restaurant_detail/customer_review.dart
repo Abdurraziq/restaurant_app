@@ -1,15 +1,16 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:restaurant_app/domain/domain.dart';
 
 part 'customer_review.g.dart';
 
 @JsonSerializable()
-class CustomerReviewModel {
-  String? name;
-  String? review;
-  String? date;
+class CustomerReviewModel extends Equatable {
+  final String? name;
+  final String? review;
+  final String? date;
 
-  CustomerReviewModel({this.name, this.review, this.date});
+  const CustomerReviewModel({this.name, this.review, this.date});
 
   factory CustomerReviewModel.fromJson(Map<String, dynamic> json) {
     return _$CustomerReviewModelFromJson(json);
@@ -22,4 +23,7 @@ class CustomerReviewModel {
         review: "$review",
         date: "$date",
       );
+
+  @override
+  List<Object?> get props => [name, review, date];
 }

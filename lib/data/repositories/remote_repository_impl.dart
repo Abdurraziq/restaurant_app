@@ -4,9 +4,9 @@ import 'package:restaurant_app/commons/commons.dart';
 import 'package:restaurant_app/data/data.dart';
 import 'package:restaurant_app/domain/domain.dart';
 
-class RestaurantRepositoryImpl implements RestaurantRepository {
-  final DataSource dataSource;
-  RestaurantRepositoryImpl({required this.dataSource});
+class RemoteRepositoryImpl implements RemoteRepository {
+  final RemoteDataSource dataSource;
+  RemoteRepositoryImpl({required this.dataSource});
 
   Future<ApiState<T>> _returnValue<T>(Future<T> Function() F) async {
     try {
@@ -48,7 +48,7 @@ class RestaurantRepositoryImpl implements RestaurantRepository {
 
   @override
   Future<ApiState<List<CustomerReview>>> addNewReview(
-      AddNewReview review) async {
+      Map<String, String> review) async {
     return _returnValue<List<CustomerReview>>(() async {
       final data = await dataSource.addNewReview(review);
       return data.reversed.map((e) => e.toEntity()).toList();

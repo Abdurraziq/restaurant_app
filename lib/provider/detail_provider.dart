@@ -3,7 +3,7 @@ import 'package:restaurant_app/commons/commons.dart';
 import 'package:restaurant_app/domain/domain.dart';
 
 class DetailProvider with ChangeNotifier {
-  final RestaurantRepository _repository;
+  final RemoteRepository _repository;
 
   DetailProvider(
     this._repository,
@@ -19,23 +19,24 @@ class DetailProvider with ChangeNotifier {
   void _setRestaurantDetailLoading() {
     if (_restaurantDetailApiState is! OnLoading<RestaurantDetail>) {
       _restaurantDetailApiState = OnLoading();
-      notifyListeners();
     }
   }
 
-  void _setRestaurantDetailData(ApiState<RestaurantDetail> data) {
-    _restaurantDetailApiState = data;
+  void _setRestaurantDetailData() async {
+    final restaurant = await _repository.getRestaurantDetail(_restaurantId);
+    _restaurantDetailApiState = restaurant;
     notifyListeners();
   }
 
   void refreshDetailData() async {
     _setRestaurantDetailLoading();
-    final restaurant = await _repository.getRestaurantDetail(_restaurantId);
-    _setRestaurantDetailData(restaurant);
+    notifyListeners();
+    _setRestaurantDetailData();
   }
 
-  void setRestaurantDetailData(String id) {
+  void getRestaurantDetailData(String id) async {
     _restaurantId = id;
-    refreshDetailData();
+    _setRestaurantDetailLoading();
+    _setRestaurantDetailData();
   }
 }

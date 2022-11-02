@@ -1,4 +1,6 @@
-class RestaurantDetail {
+import 'package:equatable/equatable.dart';
+
+class RestaurantDetail extends Equatable {
   final String id;
   final String name;
   final String description;
@@ -9,7 +11,7 @@ class RestaurantDetail {
   final Menus? menus;
   final List<CustomerReview>? reviews;
 
-  RestaurantDetail({
+  const RestaurantDetail({
     required this.id,
     required this.name,
     required this.description,
@@ -20,37 +22,62 @@ class RestaurantDetail {
     this.menus,
     this.reviews,
   });
+
+  @override
+  List<Object?> get props => [
+        id,
+        name,
+        description,
+        pictureId,
+        city,
+        rating,
+        categories,
+        menus,
+        reviews,
+      ];
 }
 
-class Category {
+class Category extends Equatable {
   final String name;
 
-  Category({required this.name});
+  const Category({required this.name});
+
+  @override
+  List<Object?> get props => [name];
 }
 
-class Menu {
+class Menu extends Equatable {
   final String name;
-  Menu({required this.name});
+  const Menu({required this.name});
+
+  @override
+  List<Object?> get props => [name];
 }
 
-class Menus {
+class Menus extends Equatable {
   final List<Menu>? foods;
   final List<Menu>? drinks;
 
-  Menus({
+  const Menus({
     required this.foods,
     required this.drinks,
   });
+
+  @override
+  List<Object?> get props => [foods, drinks];
 }
 
-class CustomerReview {
+class CustomerReview extends Equatable {
   final String name;
   final String review;
   final String date;
 
-  CustomerReview({
+  const CustomerReview({
     required this.name,
     required this.review,
     required this.date,
   });
+
+  @override
+  List<Object?> get props => [name, review, date];
 }

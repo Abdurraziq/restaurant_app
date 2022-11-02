@@ -1,2 +1,5 @@
-export './restaurant_detail_page.dart';
-export './restaurant_list_page.dart';
+export 'detail_page.dart';
+export 'explore_page.dart';
+export 'favorite_page.dart';
+export 'main_pages.dart';
+export 'settings_page.dart';

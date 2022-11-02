@@ -1,15 +1,14 @@
 import 'package:http/http.dart' as http;
 import 'package:restaurant_app/commons/commons.dart';
 import 'package:restaurant_app/data/data.dart';
-import 'package:restaurant_app/domain/domain.dart';
 import 'package:restaurant_app/utils/get_json.dart';
 
-const String jsonPath = "assets/data/local_restaurant.json";
-
-class DataSourceImpl implements DataSource {
+class RemoteDataSourceImpl implements RemoteDataSource {
   final http.Client client;
 
-  DataSourceImpl({required this.client});
+  RemoteDataSourceImpl({
+    required this.client,
+  });
 
   @override
   Future<RestaurantModel> getRestaurantDetail(String id) async {
@@ -45,11 +44,9 @@ class DataSourceImpl implements DataSource {
   }
 
   @override
-  Future<List<CustomerReviewItem>> addNewReview(AddNewReview review) async {
-    final response = await client.post(
-      Endpoint.addReview(),
-      body: {'id': review.id, 'name': review.name, 'review': review.review},
-    );
+  Future<List<CustomerReviewItem>> addNewReview(
+      Map<String, String> review) async {
+    final response = await client.post(Endpoint.addReview(), body: review);
 
     final jsonMap = getJsonFromResponse(response);
     final customerReviews = RestaurantReview.fromJson(jsonMap).customerReviews;
